@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リリースノート | MsgGenie</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <header>
+        <div class="header-title">💬 MsgGenie</div>
+    </header>
+
+    <main>
+        <h1>リリースノート</h1>
+        <p>MsgGenieのアップデート情報をお知らせします。</p>
+
+        <div id="release-container" style="margin-top: 20px;">
+            <p>読み込み中...</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 QcDa Project. All Rights Reserved.</p>
+    </footer>
+
+    <script src="common.js"></script>
+    <script>
+        // QcDa Project標準のGitHub Releases読み込み処理
+        // リポジトリ名は仮置きしています。実際のリポジトリ名に変更してください。
+        const repoOwner = 'qcda-dev'; 
+        const repoName = 'msg-genie'; // ※実際のリポジトリ名に書き換えてください
+
+        async function fetchReleases() {
+            const container = document.getElementById('release-container');
+            try {
+                // 開発環境でAPI制限に引っかかるのを防ぐため、仮の静的データを表示するモックアップ
+                // 実際には以下の fetch を有効にします。
+                /*
+                const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases`);
+                if (!response.ok) throw new Error('ネットワークエラー');
+                const releases = await response.json();
+                */
+                
+                // --- Mock Data (for demonstration) ---
+                const releases = [
+                    {
+                        name: "v1.0.0 - 初期リリース",
+                        published_at: "2026-07-07T12:00:00Z",
+                        body: "GASベースのシステムからWebアプリ（MsgGenie）としてリニューアルしました。\n\n- テンプレート管理機能の追加\n- 表形式での変数入力機能\n- LINE送信URLの自動生成"
+                    }
+                ];
+                // -------------------------------------
+
+                if (releases.length === 0) {
+                    container.innerHTML = '<p>リリースノートはまだありません。</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                releases.forEach(release => {
+                    const date = new Date(release.published_at).toLocaleDateString('ja-JP');
+                    const releaseEl = document.createElement('div');
+                    releaseEl.className = 'card';
+                    
+                    // マークダウン風の改行を処理（簡易版）
+                    const formattedBody = release.body.replace(/\n/g, '<br>');
+
+                    releaseEl.innerHTML = `
+                        <h2 style="margin-top:0; color:var(--primary-color);">${release.name}</h2>
+                        <p style="color:var(--text-light); font-size:0.9rem; margin-bottom:15px;">リリース日: ${date}</p>
+                        <div>${formattedBody}</div>
+                    `;
+                    container.appendChild(releaseEl);
+                });
+            } catch (error) {
+                container.innerHTML = `<p>リリース情報の取得に失敗しました。<br><a href="https://github.com/${repoOwner}/${repoName}/releases" target="_blank" style="color:var(--primary-color); text-decoration:underline;">GitHubで直接確認する</a></p>`;
+                console.error('Error fetching releases:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchReleases);
+    </script>
+</body>
+</html>
