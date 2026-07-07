@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MsgGenie - LINEメッセージ一括生成ツール | QcDa Project</title>
+    <meta name="description" content="スプレッドシートのようにリストを入力するだけで、テンプレートに基づいたパーソナライズされたLINEメッセージを一括生成・送信できるツールです。">
+    <meta name="keywords" content="LINE, メッセージ生成, 自動化, テンプレート, QcDa Project">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .hero-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .hero-desc {
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 30px 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+        .action-card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .action-card h3 {
+            margin-bottom: 10px;
+        }
+        .action-card p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">💬 MsgGenie</div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1 class="hero-title" style="border:none;">メッセージ作成をもっと簡単に。</h1>
+            <p class="hero-desc">
+                宛名や日程など、人によって変わる部分（変数）をリスト化し、<br>
+                テンプレートに当てはめて一括でLINE送信URLを生成します。
+            </p>
+        </div>
+
+        <div class="action-cards">
+            <a href="generate.html" class="card action-card">
+                <div class="action-card-icon">🚀</div>
+                <h3>メッセージを一括生成</h3>
+                <p>登録済みのテンプレートとリストを使って、メッセージを作成しLINEで送ります。</p>
+            </a>
+            
+            <a href="template.html" class="card action-card">
+                <div class="action-card-icon">📝</div>
+                <h3>テンプレートを管理</h3>
+                <p>よく使う文章を登録します。{名前} のように括弧で囲むと自動で入力欄が作られます。</p>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="https://qcda-dev.github.io/HP/terms-of-service.html" target="_blank">利用規約</a>
+            <a href="https://qcda-dev.github.io/HP/community-guidelines.html" target="_blank">コミュニティガイドライン</a>
+        </div>
+        <p>© 2026 QcDa Project. All Rights Reserved.</p>
+    </footer>
+
+    <script src="common.js"></script>
+</body>
+</html>
