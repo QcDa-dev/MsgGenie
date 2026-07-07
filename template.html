@@ -115,7 +115,12 @@
             <label>テンプレート名</label>
             <input type="text" id="templateName" placeholder="例：新規シフト打診" required>
             
-            <label style="font-weight: bold; display: block; margin-bottom: 8px;">メッセージ本文</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="font-weight: bold; margin-bottom: 0;">メッセージ本文</label>
+                <button type="button" class="btn btn-secondary btn-small" onclick="insertVariablePlaceholder()" style="color: var(--primary-color); border-color: var(--primary-color);">
+                    ＋ {変数}を挿入
+                </button>
+            </div>
             <textarea id="templateContent" rows="10" placeholder="{名前}さん、お疲れ様です。..." required></textarea>
             
             <div style="display: flex; gap: 15px; margin-top: 20px;">
@@ -186,6 +191,29 @@
             document.getElementById('templateId').value = '';
             document.getElementById('templateName').value = '';
             document.getElementById('templateContent').value = '';
+        }
+
+        function insertVariablePlaceholder() {
+            const textarea = document.getElementById('templateContent');
+            const insertText = '{ここに変数を入力}';
+            
+            // 現在のカーソル位置を取得
+            const startPos = textarea.selectionStart;
+            const endPos = textarea.selectionEnd;
+            
+            // テキストを分割して挿入
+            const textBefore = textarea.value.substring(0, startPos);
+            const textAfter = textarea.value.substring(endPos, textarea.value.length);
+            textarea.value = textBefore + insertText + textAfter;
+            
+            // フォーカスをテキストエリアに戻す
+            textarea.focus();
+            
+            // 挿入したテキストの「ここに変数を入力」の部分を選択状態（ハイライト）にし、
+            // ユーザーがすぐに文字を上書きできるようにする
+            const selectionStartPos = startPos + 1; // '{' の次の文字
+            const selectionEndPos = startPos + insertText.length - 1; // '}' の前の文字
+            textarea.setSelectionRange(selectionStartPos, selectionEndPos);
         }
 
         function editTemplate(id) {
