@@ -59,10 +59,15 @@ function initHamburgerMenu() {
     const header = document.querySelector('header');
     if (!header) return;
 
+    // 既存のボタンがあれば削除（多重生成防止）
+    const existingBtn = header.querySelector('.hamburger-btn');
+    if (existingBtn) existingBtn.remove();
+
     // Hamburger Button
     const btn = document.createElement('button');
     btn.className = 'hamburger-btn';
     btn.setAttribute('aria-label', 'メニュー');
+    // CSSのflexboxに合わせて単純なspan3つにする
     btn.innerHTML = '<span></span><span></span><span></span>';
     
     // Header Title Link
@@ -79,6 +84,7 @@ function initHamburgerMenu() {
     // Overlay
     const overlay = document.createElement('div');
     overlay.className = 'menu-overlay';
+    overlay.id = 'menuOverlay'; // 識別用ID
     
     const navUrls = {
         guide: 'guide.html',
@@ -105,6 +111,13 @@ function initHamburgerMenu() {
     // Backdrop
     const backdrop = document.createElement('div');
     backdrop.className = 'menu-backdrop';
+    backdrop.id = 'menuBackdrop';
+
+    // 既存のメニューがあれば削除して再追加
+    const oldOverlay = document.getElementById('menuOverlay');
+    const oldBackdrop = document.getElementById('menuBackdrop');
+    if (oldOverlay) oldOverlay.remove();
+    if (oldBackdrop) oldBackdrop.remove();
 
     document.body.appendChild(overlay);
     document.body.appendChild(backdrop);
