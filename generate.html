@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メッセージ一括生成 | MsgGenie</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .setup-area {
+            margin-bottom: 20px;
+        }
+        
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        /* プレビューエリア */
+        .preview-area {
+            display: none;
+            margin-top: 20px;
+        }
+        .preview-card {
+            background: #fff;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .preview-text {
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-line {
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .btn-line::before {
+            content: 'LINE';
+            font-weight: 900;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">💬 MsgGenie</div>
+    </header>
+
+    <main>
+        <h1>メッセージ一括生成</h1>
+
+        <div class="card setup-area">
+            <label>使用するテンプレートを選択</label>
+            <select id="templateSelect" onchange="setupTable()">
+                <option value="">-- 選択してください --</option>
+            </select>
+            <div id="templatePreview" style="font-size:0.85rem; color:#666; white-space:pre-wrap; margin-top:10px; display:none; background:#f0f0f0; padding:10px; border-radius:4px;"></div>
+        </div>
+
+        <div id="inputArea" style="display: none;">
+            <div class="action-bar">
+                <h2>リスト入力</h2>
+                <div>
+                    <button class="btn btn-secondary btn-small" onclick="addRow()">＋ 行を追加</button>
+                    <button class="btn btn-primary" onclick="generateMessages()">✨ 生成する</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr id="tableHeader">
+                            <!-- JSで動的にヘッダーを生成 -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- JSで動的に入力行を生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="resultArea" class="preview-area">
+            <div class="action-bar">
+                <h2>生成結果</h2>
+                <button class="btn btn-secondary btn-small" onclick="backToInput()">← 入力に戻る</button>
+            </div>
+            <div id="previewList">
+                <!-- 生成結果がここに表示される -->
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>© 2026 QcDa Project. All Rights Reserved.</p>
+    </footer>
+
+    <script src="common.js"></script>
+    <script>
+        let currentTemplate = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const templates = DB.getTemplates();
+            const select = document.getElementById('templateSelect');
+            
+            templates.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                select.appendChild(opt);
+            });
+        });
+
+        function setupTable() {
+            const select = document.getElementById('templateSelect');
+            const id = select.value;
+            const previewEl = document.getElementById('templatePreview');
+            
+            if (!id) {
+                document.getElementById('inputArea').style.display = 'none';
+                previewEl.style.display = 'none';
+                currentTemplate = null;
+                return;
+            }
+
+            currentTemplate = DB.getTemplateById(id);
+            if(!currentTemplate) return;
+
+            // テンプレートプレビューの表示
+            previewEl.textContent = currentTemplate.content;
+            previewEl.style.display = 'block';
+
+            // テーブルの構築
+            const thead = document.getElementById('tableHeader');
+            const tbody = document.getElementById('tableBody');
+            
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            // ヘッダー作成
+            const thNum = document.createElement('th');
+            thNum.textContent = '#';
+            thNum.style.width = '40px';
+            thead.appendChild(thNum);
+
+            currentTemplate.variables.forEach(v => {
+                const th = document.createElement('th');
+                th.textContent = v;
+                thead.appendChild(th);
+            });
+            
+            const thAction = document.createElement('th');
+            thAction.textContent = '操作';
+            thAction.style.width = '60px';
+            thead.appendChild(thAction);
+
+            // 初期行を3行追加
+            for(let i=0; i<3; i++) {
+                addRow();
+            }
+
+            document.getElementById('inputArea').style.display = 'block';
+            document.getElementById('resultArea').style.display = 'none';
+        }
+
+        function addRow() {
+            if(!currentTemplate) return;
+            const tbody = document.getElementById('tableBody');
+            const tr = document.createElement('tr');
+            
+            const tdNum = document.createElement('td');
+            tdNum.textContent = tbody.children.length + 1;
+            tr.appendChild(tdNum);
+
+            currentTemplate.variables.forEach(v => {
+                const td = document.createElement('td');
+                td.innerHTML = `<input type="text" data-var="${v}" placeholder="${v}">`;
+                tr.appendChild(td);
+            });
+
+            const tdAction = document.createElement('td');
+            tdAction.innerHTML = `<button class="btn btn-secondary btn-small" onclick="this.closest('tr').remove(); updateRowNumbers();">✕</button>`;
+            tr.appendChild(tdAction);
+
+            tbody.appendChild(tr);
+        }
+
+        function updateRowNumbers() {
+            const rows = document.getElementById('tableBody').children;
+            for(let i=0; i<rows.length; i++) {
+                rows[i].children[0].textContent = i + 1;
+            }
+        }
+
+        function generateMessages() {
+            if(!currentTemplate) return;
+
+            const rows = document.getElementById('tableBody').children;
+            const previewList = document.getElementById('previewList');
+            previewList.innerHTML = '';
+
+            let hasData = false;
+
+            for(let i=0; i<rows.length; i++) {
+                const inputs = rows[i].querySelectorAll('input[type="text"]');
+                let message = currentTemplate.content;
+                let rowHasValue = false;
+
+                inputs.forEach(input => {
+                    const varName = input.getAttribute('data-var');
+                    const value = input.value.trim();
+                    if(value) rowHasValue = true;
+                    
+                    // すべての {変数名} を置換
+                    const regex = new RegExp(`\\{${varName}\\}`, 'g');
+                    message = message.replace(regex, value);
+                });
+
+                // 1つも入力がない行はスキップ
+                if(!rowHasValue) continue;
+                hasData = true;
+
+                // LINE URL生成 (UTF-8エンコード)
+                const encodedMessage = encodeURIComponent(message);
+                const lineUrl = `https://line.me/R/msg/text/?${encodedMessage}`;
+
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.innerHTML = `
+                    <div style="font-weight:bold; margin-bottom:5px;">行 ${i+1}</div>
+                    <div class="preview-text">${escapeHtml(message)}</div>
+                    <div class="preview-actions">
+                        <button class="btn btn-secondary btn-small" onclick="navigator.clipboard.writeText(\`${escapeHtml(message).replace(/`/g, '\\`')}\`); alert('コピーしました');">コピー</button>
+                        <a href="${lineUrl}" target="_blank" rel="noopener noreferrer" class="btn-line">送信</a>
+                    </div>
+                `;
+                previewList.appendChild(card);
+            }
+
+            if(!hasData) {
+                alert('データが入力されていません。');
+                return;
+            }
+
+            document.getElementById('inputArea').style.display = 'none';
+            document.getElementById('resultArea').style.display = 'block';
+        }
+
+        function backToInput() {
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('inputArea').style.display = 'block';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, function(match) {
+                const escape = {
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                };
+                return escape[match];
+            });
+        }
+    </script>
+</body>
+</html>
