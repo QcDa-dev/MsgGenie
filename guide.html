@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使い方ガイド | MsgGenie</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .guide-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .guide-section h3 {
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .step-list {
+            padding-left: 20px;
+        }
+        .step-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">💬 MsgGenie</div>
+    </header>
+
+    <main>
+        <h1>使い方ガイド</h1>
+        <p>MsgGenieは、スプレッドシートの操作感そのままに、ブラウザ上でLINEメッセージを一括作成できるツールです。</p>
+
+        <div class="guide-section" style="margin-top: 20px;">
+            <h3>Step 1: テンプレートを作成する</h3>
+            <ol class="step-list">
+                <li>トップページの「テンプレートを管理」をタップします。</li>
+                <li>「＋ 新規テンプレート作成」ボタンを押します。</li>
+                <li>文章の中で、宛名や日程など<strong>人によって変わる部分</strong>を <code>{名前}</code> のように波括弧（中括弧）で囲みます。<br>
+                    例: <code>{名前}さん、{日程}のシフトについて...</code>
+                </li>
+                <li>「保存する」を押します。</li>
+            </ol>
+        </div>
+
+        <div class="guide-section">
+            <h3>Step 2: リストを入力する</h3>
+            <ol class="step-list">
+                <li>トップページの「メッセージを一括生成」をタップします。</li>
+                <li>プルダウンから、作成したテンプレートを選択します。</li>
+                <li>テンプレートに設定した <code>{変数}</code> が表のヘッダーとして自動的に表示されます。</li>
+                <li>各行に、送信先ごとのデータ（名前や日程など）を入力します。足りない場合は「＋ 行を追加」を押します。</li>
+            </ol>
+        </div>
+
+        <div class="guide-section">
+            <h3>Step 3: メッセージを生成・送信する</h3>
+            <ol class="step-list">
+                <li>入力が終わったら「✨ 生成する」ボタンを押します。</li>
+                <li>各行のデータが埋め込まれた完成メッセージのプレビューが一覧表示されます。</li>
+                <li>「LINE送信」ボタンを押すと、LINEアプリが起動（PCの場合はLINEのWeb版またはアプリ）し、テキストが入力された状態で送信先を選択できます。</li>
+                <li>必要に応じて「コピー」ボタンでテキストだけをコピーすることも可能です。</li>
+            </ol>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>© 2026 QcDa Project. All Rights Reserved.</p>
+    </footer>
+
+    <script src="common.js"></script>
+</body>
+</html>
