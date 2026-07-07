@@ -45,19 +45,29 @@ const DB = {
 };
 
 // ==========================================================================
-// DOM Content Loaded Event
+// App Initialization
 // ==========================================================================
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
     initHamburgerMenu();
     setupInitialData();
-});
+}
+
+// DOMの読み込み状態を判定して、安全に初期化関数を呼び出す
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 // ==========================================================================
 // Hamburger Menu Logic
 // ==========================================================================
 function initHamburgerMenu() {
     const header = document.querySelector('header');
-    if (!header) return;
+    if (!header) {
+        console.error('Header element not found. Cannot render hamburger menu.');
+        return;
+    }
 
     // 既存のボタンがあれば削除（多重生成防止）
     const existingBtn = header.querySelector('.hamburger-btn');
@@ -67,7 +77,6 @@ function initHamburgerMenu() {
     const btn = document.createElement('button');
     btn.className = 'hamburger-btn';
     btn.setAttribute('aria-label', 'メニュー');
-    // CSSのflexboxに合わせて単純なspan3つにする
     btn.innerHTML = '<span></span><span></span><span></span>';
     
     // Header Title Link
