@@ -1,0 +1,342 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+Base Styles & Variables
+========================================================================== /
+:root {
+--primary-color: #06C755; / LINE Green */
+--primary-hover: #05B34C;
+--secondary-color: #f3f4f6;
+--text-main: #333333;
+--text-light: #6b7280;
+--bg-color: #fafafa;
+--border-color: #e5e7eb;
+--header-height: 60px;
+--font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+}
+
+{
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
+
+body {
+font-family: var(--font-family);
+color: var(--text-main);
+background-color: var(--bg-color);
+line-height: 1.6;
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+}
+
+a {
+text-decoration: none;
+color: inherit;
+}
+
+ul {
+list-style: none;
+}
+
+button {
+cursor: pointer;
+border: none;
+background: none;
+font-family: inherit;
+}
+
+/* ==========================================================================
+Header & Hamburger Menu
+========================================================================== */
+header {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: var(--header-height);
+background-color: #ffffff;
+border-bottom: 1px solid var(--border-color);
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 0 20px;
+z-index: 1000;
+box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header-title {
+font-size: 1.2rem;
+font-weight: bold;
+color: var(--primary-color);
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.hamburger-btn {
+width: 30px;
+height: 24px;
+position: relative;
+z-index: 1002;
+}
+
+.hamburger-btn span {
+display: block;
+position: absolute;
+height: 3px;
+width: 100%;
+background-color: var(--text-main);
+border-radius: 3px;
+transition: all 0.3s ease-in-out;
+}
+
+.hamburger-btn span:nth-child(1) { top: 0; }
+.hamburger-btn span:nth-child(2) { top: 10px; }
+.hamburger-btn span:nth-child(3) { top: 20px; }
+
+.hamburger-btn.active span:nth-child(1) {
+top: 10px;
+transform: rotate(45deg);
+}
+.hamburger-btn.active span:nth-child(2) {
+opacity: 0;
+}
+.hamburger-btn.active span:nth-child(3) {
+top: 10px;
+transform: rotate(-45deg);
+}
+
+/* Hamburger Menu Overlay */
+.menu-overlay {
+position: fixed;
+top: 0;
+right: -100%;
+width: 280px;
+height: 100vh;
+background-color: #ffffff;
+box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+transition: right 0.3s ease-in-out;
+z-index: 1001;
+padding-top: var(--header-height);
+display: flex;
+flex-direction: column;
+}
+
+.menu-overlay.active {
+right: 0;
+}
+
+.menu-list {
+padding: 20px 0;
+flex-grow: 1;
+}
+
+.menu-list li a {
+display: block;
+padding: 15px 25px;
+font-size: 1rem;
+border-bottom: 1px solid var(--secondary-color);
+transition: background-color 0.2s;
+}
+
+.menu-list li a:hover {
+background-color: var(--secondary-color);
+}
+
+.menu-list li.menu-separator {
+border-bottom: 1px solid var(--border-color);
+margin-bottom: 15px;
+padding-bottom: 5px;
+}
+
+.menu-sub-item a {
+font-size: 0.85rem;
+color: var(--text-light);
+padding: 10px 25px 10px 40px; /* 1段落下げる */
+border-bottom: none !important;
+}
+
+.menu-version {
+padding: 15px 25px;
+font-size: 0.8rem;
+color: #a0a0a0;
+text-align: right;
+}
+
+.menu-backdrop {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background-color: rgba(0,0,0,0.5);
+z-index: 1000;
+display: none;
+}
+.menu-backdrop.active {
+display: block;
+}
+
+/* ==========================================================================
+Main Content Layout
+========================================================================== */
+main {
+flex-grow: 1;
+padding: calc(var(--header-height) + 20px) 20px 40px;
+max-width: 1000px;
+margin: 0 auto;
+width: 100%;
+}
+
+h1 {
+font-size: 1.5rem;
+margin-bottom: 20px;
+color: var(--text-main);
+border-bottom: 2px solid var(--primary-color);
+padding-bottom: 8px;
+display: inline-block;
+}
+
+h2 {
+font-size: 1.2rem;
+margin-bottom: 15px;
+margin-top: 30px;
+}
+
+/* ==========================================================================
+UI Components
+========================================================================== */
+.btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 10px 20px;
+border-radius: 8px;
+font-weight: bold;
+transition: opacity 0.2s, background-color 0.2s;
+text-align: center;
+}
+
+.btn:hover {
+opacity: 0.8;
+}
+
+.btn-primary {
+background-color: var(--primary-color);
+color: white;
+}
+
+.btn-secondary {
+background-color: var(--secondary-color);
+color: var(--text-main);
+border: 1px solid var(--border-color);
+}
+
+.btn-danger {
+background-color: #ef4444;
+color: white;
+}
+
+.btn-small {
+padding: 6px 12px;
+font-size: 0.9rem;
+border-radius: 4px;
+}
+
+input[type="text"],
+textarea,
+select {
+width: 100%;
+padding: 10px;
+border: 1px solid var(--border-color);
+border-radius: 6px;
+font-size: 1rem;
+font-family: inherit;
+margin-bottom: 15px;
+}
+
+input:focus, textarea:focus, select:focus {
+outline: none;
+border-color: var(--primary-color);
+box-shadow: 0 0 0 2px rgba(6, 199, 85, 0.2);
+}
+
+.card {
+background: white;
+border-radius: 10px;
+padding: 20px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+margin-bottom: 20px;
+border: 1px solid var(--border-color);
+}
+
+/* Table Styles (for spreadsheet-like input) */
+.table-container {
+overflow-x: auto;
+background: white;
+border: 1px solid var(--border-color);
+border-radius: 8px;
+margin-bottom: 20px;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+min-width: 600px;
+}
+
+th, td {
+padding: 10px;
+border-bottom: 1px solid var(--border-color);
+border-right: 1px solid var(--border-color);
+text-align: left;
+}
+th:last-child, td:last-child {
+border-right: none;
+}
+
+th {
+background-color: var(--secondary-color);
+font-weight: bold;
+position: sticky;
+top: 0;
+}
+
+td input[type="text"] {
+margin-bottom: 0;
+border: none;
+background: transparent;
+padding: 5px;
+border-radius: 0;
+border-bottom: 1px dashed transparent;
+}
+td input[type="text"]:focus {
+box-shadow: none;
+border-bottom: 1px dashed var(--primary-color);
+background: #f9f9f9;
+}
+
+/* ==========================================================================
+Footer
+========================================================================== */
+footer {
+margin-top: auto;
+text-align: center;
+padding: 20px;
+background-color: var(--text-main);
+color: white;
+font-size: 0.8rem;
+}
+
+.footer-links {
+margin-bottom: 10px;
+}
+.footer-links a {
+color: #a0a0a0;
+margin: 0 10px;
+}
+.footer-links a:hover {
+color: white;
+}
