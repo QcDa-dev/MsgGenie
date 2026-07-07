@@ -108,7 +108,7 @@ function initHamburgerMenu() {
         <ul class="menu-list">
             <li><a href="${navUrls.guide}" target="_blank">使い方ガイド</a></li>
             <li><a href="${navUrls.contact}" target="_blank">お問い合わせ</a></li>
-            <li class="menu-separator"><a href="${navUrls.release}" target="_blank" style="text-decoration: underline;">リリースノート</a></li>
+            <li class="menu-separator"><a href="${navUrls.release}" target="_blank">リリースノート</a></li>
             
             <li><a href="${navUrls.about}" target="_blank">QcDa Projectとは</a></li>
             <li class="menu-sub-item"><a href="${navUrls.terms}" target="_blank">利用規約</a></li>
