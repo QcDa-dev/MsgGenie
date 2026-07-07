@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テンプレート管理 | MsgGenie</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="stylesheet" href="common.css">
+    <style>
+        .template-list {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .template-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .template-info h3 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        .template-vars {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+        }
+        .template-actions {
+            display: flex;
+            gap: 10px;
+        }
+        #templateForm {
+            display: none; /* 初期状態は非表示 */
+        }
+        .variable-hint {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: var(--secondary-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">💬 MsgGenie</div>
+    </header>
+
+    <main>
+        <h1>テンプレート管理</h1>
+        
+        <div id="templateListArea">
+            <div class="template-list" id="templateList">
+                <!-- テンプレート一覧がここに表示される -->
+            </div>
+            <button class="btn btn-primary" onclick="showForm()">＋ 新規テンプレート作成</button>
+        </div>
+
+        <div id="templateForm" class="card">
+            <h2 id="formTitle">新規作成</h2>
+            <div class="variable-hint">
+                💡 <strong>ヒント:</strong><br>
+                文章の中で、人によって変えたい部分を <code>{名前}</code> や <code>{日程}</code> のように波括弧 <code>{}</code> で囲んでください。<br>
+                送信時に自動で入力欄が作成されます。
+            </div>
+            
+            <input type="hidden" id="templateId">
+            
+            <label>テンプレート名</label>
+            <input type="text" id="templateName" placeholder="例：新規シフト打診" required>
+            
+            <label>メッセージ本文</label>
+            <textarea id="templateContent" rows="10" placeholder="{名前}さん、お疲れ様です。..." required></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-primary" onclick="saveTemplate()">保存する</button>
+                <button class="btn btn-secondary" onclick="hideForm()">キャンセル</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 QcDa Project. All Rights Reserved.</p>
+    </footer>
+
+    <script src="common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', loadTemplates);
+
+        function loadTemplates() {
+            const templates = DB.getTemplates();
+            const listEl = document.getElementById('templateList');
+            listEl.innerHTML = '';
+
+            if (templates.length === 0) {
+                listEl.innerHTML = '<p style="color:#666;">テンプレートがありません。</p>';
+                return;
+            }
+
+            templates.forEach(t => {
+                const varsStr = t.variables.length > 0 
+                    ? `変数: {${t.variables.join('}, {')}}` 
+                    : '変数なし';
+
+                const card = document.createElement('div');
+                card.className = 'card template-item';
+                card.innerHTML = `
+                    <div class="template-info">
+                        <h3>${escapeHtml(t.name)}</h3>
+                        <div class="template-vars">${escapeHtml(varsStr)}</div>
+                    </div>
+                    <div class="template-actions">
+                        <button class="btn btn-secondary btn-small" onclick="editTemplate('${t.id}')">編集</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteTemplate('${t.id}')">削除</button>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        function showForm() {
+            document.getElementById('templateListArea').style.display = 'none';
+            document.getElementById('templateForm').style.display = 'block';
+            document.getElementById('formTitle').textContent = '新規作成';
+            clearForm();
+        }
+
+        function hideForm() {
+            document.getElementById('templateListArea').style.display = 'block';
+            document.getElementById('templateForm').style.display = 'none';
+        }
+
+        function clearForm() {
+            document.getElementById('templateId').value = '';
+            document.getElementById('templateName').value = '';
+            document.getElementById('templateContent').value = '';
+        }
+
+        function editTemplate(id) {
+            const t = DB.getTemplateById(id);
+            if (!t) return;
+            
+            document.getElementById('templateId').value = t.id;
+            document.getElementById('templateName').value = t.name;
+            document.getElementById('templateContent').value = t.content;
+            
+            document.getElementById('formTitle').textContent = 'テンプレート編集';
+            document.getElementById('templateListArea').style.display = 'none';
+            document.getElementById('templateForm').style.display = 'block';
+        }
+
+        function saveTemplate() {
+            const id = document.getElementById('templateId').value;
+            const name = document.getElementById('templateName').value.trim();
+            const content = document.getElementById('templateContent').value.trim();
+
+            if (!name || !content) {
+                alert('テンプレート名と本文を入力してください。');
+                return;
+            }
+
+            const variables = extractVariables(content);
+
+            DB.saveTemplate({
+                id: id || null,
+                name: name,
+                content: content,
+                variables: variables
+            });
+
+            hideForm();
+            loadTemplates();
+        }
+
+        function deleteTemplate(id) {
+            if (confirm('本当に削除しますか？')) {
+                DB.deleteTemplate(id);
+                loadTemplates();
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, function(match) {
+                const escape = {
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                };
+                return escape[match];
+            });
+        }
+    </script>
+</body>
+</html>
