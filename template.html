@@ -18,7 +18,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin-bottom: 0; /* gridのgapに任せる */
+            margin-bottom: 0;
         }
         @media (min-width: 600px) {
             .template-item {
@@ -93,6 +93,7 @@
         <div id="templateListArea">
             <div id="templateList" class="template-list">
                 <!-- テンプレート一覧がここに表示される -->
+                <p style="text-align:center; padding: 40px; color:var(--text-light);">データを読み込み中...</p>
             </div>
             
             <div class="floating-add-btn-container">
@@ -136,11 +137,14 @@
 
     <script src="common.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', loadTemplates);
+        // DOMContentLoadedではなく、Firebase初期化後のdbReadyイベントを待つ
+        document.addEventListener('dbReady', loadTemplates);
 
-        function loadTemplates() {
-            const templates = DB.getTemplates();
+        async function loadTemplates() {
             const listEl = document.getElementById('templateList');
+            listEl.innerHTML = '<p style="text-align:center; padding: 40px; color:var(--text-light);">データを読み込み中...</p>';
+
+            const templates = await DB.getTemplates();
             listEl.innerHTML = '';
 
             if (templates.length === 0) {
@@ -209,8 +213,7 @@
             // フォーカスをテキストエリアに戻す
             textarea.focus();
             
-            // 挿入したテキストの「ここに変数を入力」の部分を選択状態（ハイライト）にし、
-            // ユーザーがすぐに文字を上書きできるようにする
+            // 挿入したテキストの「ここに変数を入力」の部分を選択状態（ハイライト）にする
             const selectionStartPos = startPos + 1; // '{' の次の文字
             const selectionEndPos = startPos + insertText.length - 1; // '}' の前の文字
             textarea.setSelectionRange(selectionStartPos, selectionEndPos);
@@ -229,7 +232,7 @@
             document.getElementById('templateForm').style.display = 'block';
         }
 
-        function saveTemplate() {
+        async function saveTemplate() {
             const id = document.getElementById('templateId').value;
             const name = document.getElementById('templateName').value.trim();
             const content = document.getElementById('templateContent').value.trim();
@@ -241,21 +244,33 @@
 
             const variables = extractVariables(content);
 
-            DB.saveTemplate({
+            // 保存中のUIブロック
+            const saveBtn = document.querySelector('#templateForm .btn-primary');
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = '保存中...';
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+
+            await DB.saveTemplate({
                 id: id || null,
                 name: name,
                 content: content,
                 variables: variables
             });
 
+            // UIを元に戻す
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+            saveBtn.style.opacity = '1';
+
             hideForm();
-            loadTemplates();
+            await loadTemplates();
         }
 
-        function deleteTemplate(id) {
+        async function deleteTemplate(id) {
             if (confirm('本当に削除しますか？')) {
-                DB.deleteTemplate(id);
-                loadTemplates();
+                await DB.deleteTemplate(id);
+                await loadTemplates();
             }
         }
 
