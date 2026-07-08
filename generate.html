@@ -109,7 +109,7 @@
         <div class="card setup-area">
             <label>使用するテンプレートを選択</label>
             <select id="templateSelect" onchange="setupTable()">
-                <option value="">-- テンプレートを選択してください --</option>
+                <option value="">-- 読み込み中... --</option>
             </select>
             <div id="templatePreview" class="template-preview-box"></div>
         </div>
@@ -157,10 +157,12 @@
     <script>
         let currentTemplate = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const templates = DB.getTemplates();
+        // Firebase初期化後のdbReadyイベントを待つ
+        document.addEventListener('dbReady', async () => {
             const select = document.getElementById('templateSelect');
+            const templates = await DB.getTemplates();
             
+            select.innerHTML = '<option value="">-- テンプレートを選択してください --</option>';
             templates.forEach(t => {
                 const opt = document.createElement('option');
                 opt.value = t.id;
