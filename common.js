@@ -4,52 +4,128 @@
 const APP_VERSION = '1.0.0';
 
 // ==========================================================================
-// Firebase Mock Database (LocalStorage Wrapper)
+// Firebase Configuration & Database Logic
 // ==========================================================================
-// 将来的にFirebase Firestoreに置き換えやすいようにラッパー関数を作成
+// ★ ここにご自身のFirebaseプロジェクトの設定を貼り付けてください ★
+const firebaseConfig = {
+    apiKey: "AIzaSyB4HWNaGfVBIqqSTDSRwpMW6uHkp3eK_zc",
+    authDomain: "msggenie-b8eb0.firebaseapp.com",
+    projectId: "msggenie-b8eb0",
+    storageBucket: "msggenie-b8eb0.firebasestorage.app",
+    messagingSenderId: "6317505830",
+    appId: "1:6317505830:web:0f099e83ec1caed65b55e7"
+};
+
+// APIキーが初期値から変更されていればFirebaseが設定されたとみなす
+const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+let db = null;
+let templatesCache = [];
+
+async function initDatabase() {
+    if (isFirebaseConfigured) {
+        try {
+            // Firebase SDK v10を動的にインポート（HTMLにScriptタグを書かずに済むスマートな手法）
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+            const { getFirestore } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            console.log("🔥 Firebase Firestore Initialize Success.");
+        } catch (e) {
+            console.error("Firebase initialization failed:", e);
+        }
+    } else {
+        console.warn("⚠️ Firebase is not configured. Falling back to LocalStorage.");
+    }
+}
+
 const DB = {
     _key: 'qcda_msggenie_templates',
     
-    getTemplates: function() {
-        const data = localStorage.getItem(this._key);
-        return data ? JSON.parse(data) : [];
-    },
-    
-    saveTemplate: function(template) {
-        const templates = this.getTemplates();
-        if (template.id) {
-            // Update
-            const index = templates.findIndex(t => t.id === template.id);
-            if (index !== -1) {
-                templates[index] = template;
+    async getTemplates() {
+        if (isFirebaseConfigured && db) {
+            const { collection, getDocs, orderBy, query } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            try {
+                // 作成日時順（降順）で取得
+                const q = query(collection(db, "templates"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                templatesCache = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                return templatesCache;
+            } catch (e) {
+                console.error("Error getting documents: ", e);
+                alert("データの取得に失敗しました。Firestoreのセキュリティルールをご確認ください。");
+                return [];
             }
         } else {
-            // Create
-            template.id = 'tmpl_' + Date.now();
-            templates.push(template);
+            // LocalStorage フォールバック
+            const data = localStorage.getItem(this._key);
+            templatesCache = data ? JSON.parse(data) : [];
+            return templatesCache;
         }
-        localStorage.setItem(this._key, JSON.stringify(templates));
+    },
+    
+    async saveTemplate(template) {
+        if (isFirebaseConfigured && db) {
+            const { collection, doc, setDoc, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            if (template.id) {
+                // 更新
+                const docRef = doc(db, "templates", template.id);
+                await setDoc(docRef, {
+                    name: template.name,
+                    content: template.content,
+                    variables: template.variables,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            } else {
+                // 新規作成
+                const docRef = await addDoc(collection(db, "templates"), {
+                    name: template.name,
+                    content: template.content,
+                    variables: template.variables,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+                template.id = docRef.id;
+            }
+        } else {
+            // LocalStorage フォールバック
+            if (template.id) {
+                const index = templatesCache.findIndex(t => t.id === template.id);
+                if (index !== -1) templatesCache[index] = template;
+            } else {
+                template.id = 'tmpl_' + Date.now();
+                templatesCache.push(template);
+            }
+            localStorage.setItem(this._key, JSON.stringify(templatesCache));
+        }
         return template;
     },
     
-    deleteTemplate: function(id) {
-        let templates = this.getTemplates();
-        templates = templates.filter(t => t.id !== id);
-        localStorage.setItem(this._key, JSON.stringify(templates));
+    async deleteTemplate(id) {
+        if (isFirebaseConfigured && db) {
+            const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            await deleteDoc(doc(db, "templates", id));
+        } else {
+            templatesCache = templatesCache.filter(t => t.id !== id);
+            localStorage.setItem(this._key, JSON.stringify(templatesCache));
+        }
     },
 
-    getTemplateById: function(id) {
-        const templates = this.getTemplates();
-        return templates.find(t => t.id === id);
+    getTemplateById(id) {
+        // IDからの取得はすでに読み込み済みのキャッシュから同期的に返す
+        return templatesCache.find(t => t.id === id);
     }
 };
 
 // ==========================================================================
 // App Initialization
 // ==========================================================================
-function initApp() {
+async function initApp() {
     initHamburgerMenu();
-    setupInitialData();
+    await initDatabase(); // Firebaseの初期化を待つ
+    await setupInitialData(); // 初期データのセットアップを待つ
+    
+    // DBの準備が完了したことを他のJSに通知する
+    document.dispatchEvent(new CustomEvent('dbReady'));
 }
 
 // DOMの読み込み状態を判定して、安全に初期化関数を呼び出す
@@ -108,7 +184,7 @@ function initHamburgerMenu() {
         <ul class="menu-list">
             <li><a href="${navUrls.guide}" target="_blank">使い方ガイド</a></li>
             <li><a href="${navUrls.contact}" target="_blank">お問い合わせ</a></li>
-            <li class="menu-separator"><a href="${navUrls.release}" target="_blank">リリースノート</a></li>
+            <li class="menu-separator"><a href="${navUrls.release}" target="_blank" style="text-decoration: underline;">リリースノート</a></li>
             
             <li><a href="${navUrls.about}" target="_blank">QcDa Projectとは</a></li>
             <li class="menu-sub-item"><a href="${navUrls.terms}" target="_blank">利用規約</a></li>
@@ -146,12 +222,12 @@ function initHamburgerMenu() {
 // ==========================================================================
 // Setup Initial Mock Data (GASのデフォルトテンプレートを再現)
 // ==========================================================================
-function setupInitialData() {
-    const templates = DB.getTemplates();
+async function setupInitialData() {
+    const templates = await DB.getTemplates();
     if (templates.length === 0) {
         const defaultContent = `{名前}さん\nお疲れ様です！\n\n{用件}についてのご相談で連絡しました。\nもしご都合が合えば、以下の日程で対応をお願いできないでしょうか？\n科目名で「or」になっているところは、対応可能な科目を教えていただけるとありがたいです。\n\n■お願いしたい日時\n{日程}\n\nお手数ですが、【{返信期限}】までに対応可能かどうかご返信をお願いします。\n\nご予定が合わなければ全く問題ありませんので、遠慮なく教えてください！\nよろしくお願いします🙇`;
         
-        DB.saveTemplate({
+        await DB.saveTemplate({
             name: "新規打診テンプレート",
             content: defaultContent,
             variables: extractVariables(defaultContent)
