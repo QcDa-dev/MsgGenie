@@ -1,333 +1,420 @@
-@charset "UTF-8";
-
 /* ==========================================================================
-QcDa Project 共通スタイル (v2.0 - 安定版ハンバーガーメニュー統合)
-========================================================================== */
-
-/* --- CSS変数 (オリジナルの色合いを復元) --- /
+   Base Styles & Variables
+   ========================================================================== */
 :root {
---qcda-primary: #007BFF; / 青 /
---qcda-primary-hover: #0056b3;
---qcda-secondary: #f0f8ff; / 薄い青 */
---qcda-text-main: #334155;
---qcda-text-light: #64748b;
---qcda-bg-color: #f8fafc;
---qcda-border: #e2e8f0;
---qcda-success: #28a745;
---qcda-error: #ef4444;
---qcda-white: #ffffff;
---header-height: 64px;
---font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+  --primary-color: #06C755; /* LINE Green */
+  --primary-hover: #05B34C;
+  --secondary-color: #f0fdf4; /* 薄いグリーン */
+  --text-main: #334155; /* 濃いグレー */
+  --text-light: #64748b; /* 中間グレー */
+  --bg-color: #f8fafc; /* 背景をほんのりグレーにしてカードを浮き立たせる */
+  --border-color: #e2e8f0;
+  --header-height: 64px;
+  --font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
 
---shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
---shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* 立体感を出すためのシャドウ定義 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* --- リセット & 基本設定 --- */
-
-{
-box-sizing: border-box;
-margin: 0;
-padding: 0;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-font-family: var(--font-family);
-background-color: var(--qcda-bg-color);
-color: var(--qcda-text-main);
-line-height: 1.6;
-display: flex;
-flex-direction: column;
-min-height: 100vh;
--webkit-font-smoothing: antialiased;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-color: var(--qcda-primary);
-text-decoration: none;
+  color: var(--primary-color);
+  text-decoration: none;
 }
 
 /* ==========================================================================
-Header & Hamburger Menu (Reference Based - 確実に機能する構造)
-========================================================================== */
+   Header & Hamburger Menu
+   ========================================================================== */
 header {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: var(--header-height);
-background-color: var(--qcda-white);
-border-bottom: 1px solid var(--qcda-border);
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 0 20px;
-z-index: 1000;
-box-shadow: var(--shadow-sm);
-box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
 }
 
 .header-title {
-font-size: 1.3rem;
-font-weight: 800;
-color: var(--qcda-text-main); /* 教室検索は黒系テキスト */
-display: flex;
-align-items: center;
-gap: 8px;
-letter-spacing: -0.02em;
-cursor: pointer;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
 }
 
-/* ハンバーガーボタン本体 /
+/* ハンバーガーボタン本体 */
 .hamburger-btn {
-width: 44px;
-height: 44px;
-position: relative;
-z-index: 1002;
-display: flex !important; / 強制表示 /
-flex-direction: column;
-justify-content: center;
-align-items: center;
-gap: 6px;
-background: transparent;
-border: none;
-cursor: pointer;
-padding: 0;
-margin: 0;
-outline: none;
-flex-shrink: 0; / スマホで右端から押し出されるのを防ぐ */
+  width: 44px;
+  height: 44px;
+  position: relative;
+  z-index: 1002;
+  display: flex !important; /* 強制表示 */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  flex-shrink: 0; /* スマホで右端から押し出されるのを防ぐ */
 }
 
 .hamburger-btn span {
-display: block;
-height: 3px;
-width: 24px;
-background-color: var(--qcda-text-main) !important;
-border-radius: 3px;
-transition: all 0.3s ease-in-out;
+  display: block;
+  height: 3px;
+  width: 24px;
+  background-color: var(--text-main) !important;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
 }
 
 .hamburger-btn.active span:nth-child(1) {
-transform: translateY(9px) rotate(45deg);
+  transform: translateY(9px) rotate(45deg);
 }
 .hamburger-btn.active span:nth-child(2) {
-opacity: 0;
+  opacity: 0;
 }
 .hamburger-btn.active span:nth-child(3) {
-transform: translateY(-9px) rotate(-45deg);
+  transform: translateY(-9px) rotate(-45deg);
 }
 
-/* ハンバーガーメニューのオーバーレイ（スライドしてくる部分） /
+/* ハンバーガーメニューのオーバーレイ（スライドしてくる部分） */
 .menu-overlay {
-position: fixed;
-top: 0;
-right: -300px; / 初期状態は画面外 */
-width: 280px;
-height: 100vh;
-background-color: white;
-box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-transition: right 0.3s ease-in-out;
-z-index: 1001;
-display: flex;
-flex-direction: column;
-padding-top: var(--header-height);
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100vh;
+  background-color: white;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease-in-out;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--header-height);
 }
 
 .menu-overlay.active {
-right: 0; /* active時のみ画面内に表示 */
+  right: 0;
 }
 
 /* 背景を暗くするバックドロップ */
 .menu-backdrop {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100vh;
-background-color: rgba(0, 0, 0, 0.4);
-opacity: 0;
-visibility: hidden;
-transition: all 0.3s ease-in-out;
-z-index: 1000;
-backdrop-filter: blur(2px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
 }
 
 .menu-backdrop.active {
-opacity: 1;
-visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* メニュー内のリストスタイル */
 .menu-list {
-list-style: none;
-padding: 20px 0;
-flex-grow: 1;
-overflow-y: auto;
+  list-style: none;
+  padding: 20px 0;
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .menu-list li a {
-display: block;
-padding: 16px 24px;
-font-size: 1rem;
-font-weight: 500;
-border-bottom: 1px solid var(--qcda-border);
-transition: background-color 0.2s, color 0.2s;
-color: var(--qcda-text-main);
+  display: block;
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s, color 0.2s;
+  color: var(--text-main);
 }
 
 .menu-list li a:hover {
-background-color: var(--qcda-secondary);
-color: var(--qcda-primary);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 /* 区切り線用の余白 */
 .menu-list li.menu-separator {
-margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 /* サブメニュー（1段落下げ） */
 .menu-list li.menu-sub-item a {
-font-size: 0.85rem;
-color: var(--qcda-text-light);
-padding: 12px 24px 12px 40px;
-border-bottom: none !important;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  padding: 12px 24px 12px 40px;
+  border-bottom: none !important;
 }
 
 .menu-list li.menu-sub-item a:hover {
-color: var(--qcda-primary);
-background-color: transparent;
-text-decoration: underline;
+  color: var(--primary-color);
+  background-color: transparent;
+  text-decoration: underline;
 }
 
 .menu-version {
-padding: 20px;
-text-align: center;
-font-size: 0.8rem;
-color: #94a3b8;
-border-top: 1px solid var(--qcda-border);
+  padding: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  border-top: 1px solid var(--border-color);
 }
 
 /* ==========================================================================
-Main Layout & Components (オリジナルのデザインを復元)
-========================================================================== /
+   Main Layout & Typography
+   ========================================================================== */
 main {
-flex-grow: 1;
-padding: calc(var(--header-height) + 30px) 20px 60px;
-max-width: 650px; / 元の幅に戻す */
-margin: 0 auto;
-width: 100%;
+  flex-grow: 1;
+  padding: calc(var(--header-height) + 30px) 20px 60px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 30px;
+  color: var(--text-main);
+  border-bottom: 4px solid var(--primary-color);
+  padding-bottom: 10px;
+  display: inline-block;
+  letter-spacing: -0.02em;
 }
 
 h2 {
-font-size: 1.25rem;
-font-weight: 700;
-margin-bottom: 16px;
-color: var(--qcda-text-main);
-}
-
-.card {
-background: var(--qcda-white);
-border-radius: 12px;
-padding: 24px;
-box-shadow: var(--shadow-md);
-margin-bottom: 24px;
-border: 1px solid rgba(0,0,0,0.02);
-}
-
-/* ボタン (青基調) */
-.btn {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-padding: 12px 24px;
-border-radius: 8px;
-font-weight: bold;
-font-size: 1rem;
-transition: all 0.2s ease;
-text-align: center;
-box-shadow: var(--shadow-sm);
-cursor: pointer;
-border: none;
-font-family: inherit;
-background-color: var(--qcda-primary);
-color: white;
-text-decoration: none;
-box-sizing: border-box;
-}
-
-.btn:hover {
-background-color: var(--qcda-primary-hover);
-transform: translateY(-2px);
-box-shadow: var(--shadow-md);
-color: white;
-text-decoration: none;
-}
-.btn:active {
-transform: translateY(0);
-box-shadow: var(--shadow-sm);
-}
-.btn:disabled {
-background-color: #cccccc;
-cursor: not-allowed;
-transform: none;
-box-shadow: none;
-}
-
-/* フォーム要素 */
-input[type="text"],
-input[type="file"],
-select {
-width: 100%;
-padding: 12px 16px;
-border: 1px solid #cbd5e1;
-border-radius: 8px;
-font-size: 1rem;
-font-family: inherit;
-margin-bottom: 15px;
-background-color: #fff;
-transition: all 0.2s ease;
-box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-color: var(--qcda-text-main);
-box-sizing: border-box;
-}
-
-input:focus, select:focus {
-outline: none;
-border-color: var(--qcda-primary);
-box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-main);
 }
 
 /* ==========================================================================
-Footer
-========================================================================== */
+   UI Components (Buttons, Cards, Inputs)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-color);
+  border-color: #cbd5e1;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  border-radius: 6px;
+}
+
+/* カード型レイアウト（白抜きで立体的に見せる） */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 20px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  color: var(--text-main);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(6, 199, 85, 0.15);
+}
+
+/* ==========================================================================
+   Table Styles (for spreadsheet-like input)
+   ========================================================================== */
+.table-container {
+  overflow-x: auto;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* スマホで横スクロールさせるための最小幅 */
+}
+
+th, td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  text-align: left;
+  vertical-align: middle;
+}
+
+th:last-child, td:last-child {
+  border-right: none;
+}
+
+th {
+  background-color: #f1f5f9;
+  font-weight: 700;
+  color: var(--text-main);
+  position: sticky;
+  top: 0;
+  white-space: nowrap;
+}
+
+/* テーブル内のインプットは枠線を消してスッキリ見せる */
+td input[type="text"] {
+  margin-bottom: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 10px;
+  border-radius: 6px;
+  width: 100%;
+  min-width: 140px;
+  box-shadow: none;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+td input[type="text"]:focus {
+  background: white;
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(6, 199, 85, 0.1);
+}
+
+td input[type="text"]:hover:not(:focus) {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
 footer {
-margin-top: auto;
-text-align: center;
-padding: 30px 20px;
-background-color: #1e293b;
-color: white;
-font-size: 0.85rem;
+  margin-top: auto;
+  text-align: center;
+  padding: 30px 20px;
+  background-color: #1e293b;
+  color: white;
+  font-size: 0.85rem;
 }
 
 .footer-links {
-margin-bottom: 16px;
-display: flex;
-justify-content: center;
-gap: 24px;
-flex-wrap: wrap;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .footer-links a {
-color: #cbd5e1;
-text-decoration: none;
-transition: color 0.2s;
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .footer-links a:hover {
-color: white;
-text-decoration: underline;
+  color: white;
+  text-decoration: underline;
 }
-
-/* --- ユーティリティ --- */
-.text-center { text-align: center; }
-.hidden { display: none !important; }
